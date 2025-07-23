@@ -1,25 +1,32 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Code2, Palette, Zap, Users, Filter } from "lucide-react";
-import { supabase, Activity } from "@/lib/supabase";
+import {
+  Zap,
+  Palette,
+  GraduationCap,
+  Star,
+  ServerCog,
+  Terminal,
+} from "lucide-react";
+import {
+  getAllActivities,
+  getActivitiesByType,
+  getTotalActivityCount,
+  Activity,
+} from "@/lib/supabase";
 import ActivityCard from "@/components/activity-card";
 import Pagination from "@/components/pagination";
 
 export default function About() {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
+  const [totalActivities, setTotalActivities] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedType, setSelectedType] = useState<string>("all");
   const [loading, setLoading] = useState(true);
 
   const activitiesPerPage = 6;
-  const totalPages = Math.ceil(filteredActivities.length / activitiesPerPage);
-  const startIndex = (currentPage - 1) * activitiesPerPage;
-  const currentActivities = filteredActivities.slice(
-    startIndex,
-    startIndex + activitiesPerPage
-  );
+  const totalPages = Math.ceil(totalActivities / activitiesPerPage);
 
   const activityTypes = [
     { value: "all", label: "All Activities", icon: "📋" },
@@ -32,11 +39,7 @@ export default function About() {
 
   useEffect(() => {
     fetchActivities();
-  }, []);
-
-  useEffect(() => {
-    filterActivities();
-  }, [activities, selectedType]);
+  }, [selectedType, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -44,13 +47,25 @@ export default function About() {
 
   const fetchActivities = async () => {
     try {
-      const { data, error } = await supabase
-        .from("activities")
-        .select("*")
-        .order("date", { ascending: false });
+      let activitiesData: Activity[];
+      let totalCount: number;
 
-      if (error) throw error;
-      setActivities(data || []);
+      if (selectedType === "all") {
+        activitiesData = await getAllActivities(currentPage, activitiesPerPage);
+        totalCount = await getTotalActivityCount();
+      } else {
+        activitiesData = await getActivitiesByType(
+          selectedType as Activity["type"],
+          currentPage,
+          activitiesPerPage
+        );
+        totalCount = await getTotalActivityCount(
+          selectedType as Activity["type"]
+        );
+      }
+
+      setActivities(activitiesData);
+      setTotalActivities(totalCount);
     } catch (error) {
       console.error("Error fetching activities:", error);
     } finally {
@@ -58,35 +73,26 @@ export default function About() {
     }
   };
 
-  const filterActivities = () => {
-    if (selectedType === "all") {
-      setFilteredActivities(activities);
-    } else {
-      setFilteredActivities(
-        activities.filter((activity) => activity.type === selectedType)
-      );
-    }
-  };
   const skills = [
     {
+      name: "Languages",
+      icon: <Terminal size={24} />,
+      description: "Python, C#, Java, Bash, C/C++, JavaScript",
+    },
+    {
       name: "Frontend Development",
-      icon: <Code2 size={24} />,
-      description: "React, Next.js, TypeScript, Tailwind CSS",
+      icon: <Palette size={24} />,
+      description: "React, Next.js, JS/TS, Angular, Tailwind CSS",
     },
     {
       name: "Backend Development",
       icon: <Zap size={24} />,
-      description: "Node.js, Python, PostgreSQL, MongoDB",
+      description: "Python, .NET, PostgreSQL, MongoDB, InfluxDB",
     },
     {
-      name: "UI/UX Design",
-      icon: <Palette size={24} />,
-      description: "Figma, Adobe Creative Suite, User Research",
-    },
-    {
-      name: "Team Collaboration",
-      icon: <Users size={24} />,
-      description: "Git, Agile, Code Reviews, Mentoring",
+      name: "DevOps",
+      icon: <ServerCog size={24} />,
+      description: "Docker, Kubernetes, Helm, Grafana, GitLab CI/CD",
     },
   ];
 
@@ -99,30 +105,54 @@ export default function About() {
             About Me
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            I'm a passionate developer who loves creating digital experiences
-            that make a difference. With a strong foundation in both technical
-            skills and design principles, I bridge the gap between beautiful
-            interfaces and robust functionality.
+            Whether it's developing full-stack applications, scripting
+            automation tools, or building smart systems, I enjoy turning
+            complexity into functional solutions.
           </p>
         </div>
 
         {/* Story Section */}
         <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-gray-700">
-          <h2 className="text-2xl sm:text-3xl font-bold text-white mb-6">
+          <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
+            <Star size={28} className="text-blue-400" />
             My Journey
           </h2>
           <div className="space-y-4 text-gray-300 leading-relaxed">
             <p>
-              My journey into technology started with curiosity and has evolved
-              into a passion for solving complex problems through elegant code.
-              I believe in writing clean, maintainable code that not only works
-              but is also a joy to work with.
+              I got into tech because I was curious about how video games are
+              made. That curiosity led me to study IT and Computer Science in
+              college.
             </p>
             <p>
-              When I'm not coding, you'll find me exploring new technologies,
-              contributing to open source projects, or sharing knowledge with
-              the developer community. I'm always excited about the next
-              challenge and opportunity to learn.
+              Once there, I discovered a much broader world and became
+              especially interested in understanding how existing solutions were
+              designed and implemented. I was fascinated by the challenge of
+              logically breaking down complex systems to see if I could recreate
+              them or even create an improved version of my own.
+            </p>
+          </div>
+        </div>
+
+        {/* Studies Section */}
+        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-gray-700">
+          <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
+            <GraduationCap size={28} className="text-blue-400" />
+            My Studies
+          </h2>
+          <div className="space-y-4 text-gray-300 leading-relaxed">
+            <p>
+              I completed my <b>Bachelor's degree</b> in <b>Computer Science</b>{" "}
+              at the
+              <b> University of Transylvania in Brașov</b>, where I gained a
+              deep understanding of software development, systems architecture,
+              and algorithmic thinking.
+            </p>
+            <p>
+              Currently, I'm pursuing a <b>Master's degree</b> in{" "}
+              <b>Cyber Security</b> at the same university. My academic
+              background is complemented by hands-on experience in internships,
+              research projects, and competitions, where I apply what I learn in{" "}
+              <b>practical ways</b>.
             </p>
           </div>
         </div>
@@ -181,10 +211,10 @@ export default function About() {
             <div className="flex justify-center items-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
             </div>
-          ) : currentActivities.length > 0 ? (
+          ) : activities.length > 0 ? (
             <>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {currentActivities.map((activity) => (
+                {activities.map((activity) => (
                   <ActivityCard key={activity.id} activity={activity} />
                 ))}
               </div>

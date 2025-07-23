@@ -1,30 +1,133 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
+const bucket_name = "activities-images";
 
 export type Activity = {
-  id: string
-  title: string
-  description: string
-  type: 'hackathon' | 'project' | 'achievement' | 'conference' | 'workshop'
-  date: string
-  image_url?: string
-  link?: string
-  tags: string[]
-  created_at: string
-}
+  id: string;
+  title: string;
+  description: string;
+  type:
+    | "all"
+    | "hackathon"
+    | "project"
+    | "achievement"
+    | "conference"
+    | "workshop";
+  created_at: string;
+  images?: string[];
+};
 
 export type Project = {
-  id: string
-  title: string
-  description: string
-  image_url?: string
-  live_url?: string
-  github_url?: string
-  technologies: string[]
-  featured: boolean
-  created_at: string
+  id: string;
+  title: string;
+  images: string[];
+  short_descrip: string;
+  detailed_desc: string;
+  technologies_used: string[];
+  links: string[];
+  contexts: string[];
+  created_at: string;
+};
+
+export async function getAllProjects(): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data as Project[];
+}
+
+export async function getProjectById(id: string): Promise<Project | null> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error) throw new Error(error.message);
+  return data as Project;
+}
+
+export async function getProjects(): Promise<Project[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return data as Project[];
+}
+
+export async function getAllActivities(
+  page: number,
+  pageSize: number
+): Promise<Activity[]> {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) throw new Error(error.message);
+  return data as Activity[];
+}
+
+export async function getActivitiesByType(
+  type: Activity["type"],
+  page: number,
+  pageSize: number
+): Promise<Activity[]> {
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  const { data, error } = await supabase
+    .from("activities")
+    .select("*")
+    .eq("type", type)
+    .order("created_at", { ascending: false })
+    .range(from, to);
+
+  if (error) throw new Error(error.message);
+  return data as Activity[];
+}
+
+export async function getTotalActivityCount(
+  type?: Activity["type"]
+): Promise<number> {
+  let query = supabase
+    .from("activities")
+    .select("*", { count: "exact", head: true });
+
+  if (type && type !== "all") {
+    query = query.eq("type", type);
+  }
+
+  const { count, error } = await query;
+
+  if (error) throw new Error(error.message);
+  return count ?? 0;
+}
+
+export async function getActivityImageUrls(
+  title: string,
+  filenames: string[]
+): Promise<string[]> {
+  if (!filenames || filenames.length === 0) return [];
+
+  const urls = filenames.map((filename) => {
+    const { data } = supabase.storage
+      .from(bucket_name)
+      .getPublicUrl(`${title}/${filename}`);
+    return data.publicUrl;
+  });
+
+  return urls;
 }
