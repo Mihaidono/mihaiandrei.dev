@@ -16,7 +16,7 @@ export default function Navbar() {
             href="/"
             className="text-xl font-bold text-white hover:text-blue-400 transition-colors"
           >
-            Your Name
+            Mihai Andrei
           </Link>
 
           {/* Desktop Navigation */}

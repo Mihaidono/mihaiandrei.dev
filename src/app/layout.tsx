@@ -23,7 +23,7 @@ export default function RootLayout({
       >
         <AnimatedBackground />
         <Navbar />
-        <main className="relative z-10 pt-16">{children}</main>
+        <main className="relative z-10">{children}</main>
       </body>
     </html>
   );
