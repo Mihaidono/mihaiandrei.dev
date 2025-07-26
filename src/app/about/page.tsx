@@ -17,6 +17,7 @@ import {
 } from "@/lib/supabase";
 import ActivityCard from "@/components/activity-card";
 import Pagination from "@/components/pagination";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function About() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -24,9 +25,13 @@ export default function About() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedType, setSelectedType] = useState<string>("all");
   const [loading, setLoading] = useState(true);
+  const [windowWidth, setWindowWidth] = useState<number>(
+    typeof window !== "undefined" ? window.innerWidth : 1024
+  );
 
-  const activitiesPerPage = 6;
-  const totalPages = Math.ceil(totalActivities / activitiesPerPage);
+  const maxPerPage = 3;
+  const visibleCount = windowWidth < 1024 ? 2 : 3;
+  const totalPages = Math.ceil(totalActivities / maxPerPage);
 
   const activityTypes = [
     { value: "all", label: "All Activities", icon: "📋" },
@@ -38,6 +43,12 @@ export default function About() {
   ];
 
   useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
     fetchActivities();
   }, [selectedType, currentPage]);
 
@@ -46,18 +57,19 @@ export default function About() {
   }, [selectedType]);
 
   const fetchActivities = async () => {
+    setLoading(true);
     try {
       let activitiesData: Activity[];
       let totalCount: number;
 
       if (selectedType === "all") {
-        activitiesData = await getAllActivities(currentPage, activitiesPerPage);
+        activitiesData = await getAllActivities(currentPage, maxPerPage);
         totalCount = await getTotalActivityCount();
       } else {
         activitiesData = await getActivitiesByType(
           selectedType as Activity["type"],
           currentPage,
-          activitiesPerPage
+          maxPerPage
         );
         totalCount = await getTotalActivityCount(
           selectedType as Activity["type"]
@@ -72,6 +84,8 @@ export default function About() {
       setLoading(false);
     }
   };
+
+  const visibleActivities = activities.slice(0, visibleCount);
 
   const skills = [
     {
@@ -98,7 +112,7 @@ export default function About() {
 
   return (
     <div className="min-h-screen px-4 py-20">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent mb-6">
@@ -112,48 +126,51 @@ export default function About() {
         </div>
 
         {/* Story Section */}
-        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-gray-700">
-          <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
-            <Star size={28} className="text-blue-400" />
-            My Journey
-          </h2>
-          <div className="space-y-4 text-gray-300 leading-relaxed">
-            <p>
-              I got into tech because I was curious about how video games are
-              made. That curiosity led me to study IT and Computer Science in
-              college.
-            </p>
-            <p>
-              Once there, I discovered a much broader world and became
-              especially interested in understanding how existing solutions were
-              designed and implemented. I was fascinated by the challenge of
-              logically breaking down complex systems to see if I could recreate
-              them or even create an improved version of my own.
-            </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+          {/* My Journey Section */}
+          <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 h-full">
+            <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
+              <Star size={28} className="text-blue-400" />
+              My Journey
+            </h2>
+            <div className="space-y-4 text-gray-300 leading-relaxed">
+              <p>
+                I got into tech because I was curious about how video games are
+                made. That curiosity led me to study IT and Computer Science in
+                college.
+              </p>
+              <p>
+                Once there, I discovered a much broader world and became
+                especially interested in understanding how existing solutions
+                were designed and implemented. I was fascinated by the challenge
+                of logically breaking down complex systems to see if I could
+                recreate them or even create an improved version of my own.
+              </p>
+            </div>
           </div>
-        </div>
 
-        {/* Studies Section */}
-        <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 mb-12 border border-gray-700">
-          <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
-            <GraduationCap size={28} className="text-blue-400" />
-            My Studies
-          </h2>
-          <div className="space-y-4 text-gray-300 leading-relaxed">
-            <p>
-              I completed my <b>Bachelor's degree</b> in <b>Computer Science</b>{" "}
-              at the
-              <b> University of Transylvania in Brașov</b>, where I gained a
-              deep understanding of software development, systems architecture,
-              and algorithmic thinking.
-            </p>
-            <p>
-              Currently, I'm pursuing a <b>Master's degree</b> in{" "}
-              <b>Cyber Security</b> at the same university. My academic
-              background is complemented by hands-on experience in internships,
-              research projects, and competitions, where I apply what I learn in{" "}
-              <b>practical ways</b>.
-            </p>
+          {/* Studies Section */}
+          <div className="bg-gray-800/30 backdrop-blur-sm rounded-2xl p-8 border border-gray-700 h-full">
+            <h2 className="flex items-center gap-4 text-2xl sm:text-3xl font-bold text-white mb-6">
+              <GraduationCap size={28} className="text-blue-400" />
+              My Studies
+            </h2>
+            <div className="space-y-4 text-gray-300 leading-relaxed">
+              <p>
+                I completed my <b>Bachelor's degree</b> in{" "}
+                <b>Computer Science</b> at the{" "}
+                <b>University of Transylvania in Brașov</b>, where I gained a
+                deep understanding of software development, systems
+                architecture, and algorithmic thinking.
+              </p>
+              <p>
+                Currently, I'm pursuing a <b>Master's degree</b> in{" "}
+                <b>Cyber Security</b> at the same university. My academic
+                background is complemented by hands-on experience in
+                internships, research projects, and competitions, where I apply
+                what I learn in <b>practical ways</b>.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -207,37 +224,37 @@ export default function About() {
           </div>
 
           {/* Activities Grid */}
-          {loading ? (
-            <div className="flex justify-center items-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-            </div>
-          ) : activities.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {activities.map((activity) => (
-                  <ActivityCard key={activity.id} activity={activity} />
-                ))}
+          <div className="min-h-[470px] flex flex-col items-center">
+            {loading ? (
+              <div className="flex-grow flex justify-center items-center">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
               </div>
-
-              {/* Pagination */}
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-              />
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <div className="text-gray-400 text-lg mb-2">
-                No activities found
+            ) : activities.length > 0 ? (
+              <>
+                <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
+                  {visibleActivities.map((activity) => (
+                    <ActivityCard key={activity.id} activity={activity} />
+                  ))}
+                </motion.div>
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                />
+              </>
+            ) : (
+              <div className="flex-grow flex flex-col justify-center items-center text-center py-12">
+                <div className="text-gray-400 text-lg mb-2">
+                  No activities found
+                </div>
+                <p className="text-gray-500">
+                  {selectedType === "all"
+                    ? "No activities have been added yet."
+                    : `No ${selectedType} activities found.`}
+                </p>
               </div>
-              <p className="text-gray-500">
-                {selectedType === "all"
-                  ? "No activities have been added yet."
-                  : `No ${selectedType} activities found.`}
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
 
         {/* Values */}
