@@ -17,7 +17,7 @@ import {
 } from "@/lib/supabase";
 import ActivityCard from "@/components/activity-card";
 import Pagination from "@/components/pagination";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 
 export default function About() {
   const [activities, setActivities] = useState<Activity[]>([]);

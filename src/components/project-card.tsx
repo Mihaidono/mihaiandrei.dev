@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Github } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { Project, getProjectImageUrls } from "@/lib/supabase";
@@ -19,16 +19,62 @@ export default function ProjectCard({
   onDragEnd,
 }: ProjectCardProps) {
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const slideIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const resumeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchImageUrls = async () => {
       if (project.images?.length) {
         const urls = await getProjectImageUrls(project.title, project.images);
         setImageUrls(urls);
+        setCurrentIndex(0);
       }
     };
     fetchImageUrls();
   }, [project]);
+
+  const startAutoPlay = () => {
+    if (slideIntervalRef.current) clearInterval(slideIntervalRef.current);
+    slideIntervalRef.current = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % imageUrls.length);
+    }, 5000);
+  };
+
+  useEffect(() => {
+    if (imageUrls.length > 1) {
+      startAutoPlay();
+    }
+    return () => {
+      if (slideIntervalRef.current) clearInterval(slideIntervalRef.current);
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
+    };
+  }, [imageUrls]);
+
+  const resetAutoPlayWithDelay = () => {
+    if (slideIntervalRef.current) {
+      clearInterval(slideIntervalRef.current);
+      slideIntervalRef.current = null;
+    }
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current);
+      resumeTimeoutRef.current = null;
+    }
+
+    resumeTimeoutRef.current = setTimeout(() => {
+      startAutoPlay();
+    }, 6000);
+  };
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
+    resetAutoPlayWithDelay();
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % imageUrls.length);
+    resetAutoPlayWithDelay();
+  };
 
   return (
     <motion.div
@@ -63,8 +109,10 @@ export default function ProjectCard({
     >
       {/* Left Side */}
       <div className="p-4">
-        <h2 className="text-3xl font-bold text-white mb-4">{project.title}</h2>
-        <div className="max-w-none text-gray-300 text-base mb-6">
+        <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          {project.title}
+        </h2>
+        <div className="max-w-none text-gray-300 text-base mb-6 max-h-96 overflow-y-auto pr-2 scrollbar-custom">
           <ReactMarkdown>{project.description}</ReactMarkdown>
         </div>
 
@@ -81,19 +129,51 @@ export default function ProjectCard({
       </div>
 
       {/* Right Side */}
-      <div className="p-4 space-y-4">
-        {imageUrls[0] && (
-          <div className="relative w-full h-64 rounded-xl overflow-hidden">
-            <Image
-              src={imageUrls[0]}
-              alt={project.title}
-              fill
-              unoptimized
-              className="object-cover"
-            />
+      <div className="p-4 space-y-4 relative">
+        {imageUrls.length > 0 && (
+          <div className="relative w-full h-96 rounded-2xl overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={imageUrls[currentIndex]}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 w-full h-full"
+              >
+                <Image
+                  src={imageUrls[currentIndex]}
+                  alt={`${project.title} image ${currentIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                  draggable={false}
+                />
+              </motion.div>
+            </AnimatePresence>
+            {/* Arrows */}
+            {imageUrls.length > 1 && (
+              <>
+                <button
+                  onClick={goToPrevious}
+                  aria-label="Previous Image"
+                  className="absolute top-1/2 left-2 transform -translate-y-1/2 text-white p-1 rounded-full hover:text-blue-400  transition"
+                >
+                  &#8592;
+                </button>
+                <button
+                  onClick={goToNext}
+                  aria-label="Next Image"
+                  className="absolute top-1/2 right-2 transform -translate-y-1/2 text-white p-1 rounded-full hover:text-blue-400 transition"
+                >
+                  &#8594;
+                </button>
+              </>
+            )}
           </div>
         )}
 
+        {/* Technologies */}
         <div className="flex flex-wrap gap-2">
           {project.technologies_used?.map((tech) => (
             <span
@@ -105,6 +185,7 @@ export default function ProjectCard({
           ))}
         </div>
 
+        {/* Contexts */}
         {project.contexts && (
           <ul className="text-gray-400 list-disc list-inside text-sm space-y-1">
             {project.contexts.map((ctx, idx) => (

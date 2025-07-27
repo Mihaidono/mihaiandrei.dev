@@ -3,7 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const bucket_name = "activities-images";
+const activities_bucket_name = "activities-images";
+const projects_bucket_name = "projects-images";
 
 export type Activity = {
   id: string;
@@ -24,10 +25,9 @@ export type Project = {
   id: string;
   title: string;
   images: string[];
-  short_descrip: string;
-  detailed_desc: string;
+  description: string;
   technologies_used: string[];
-  links: string[];
+  repo_link: string;
   contexts: string[];
   created_at: string;
 };
@@ -40,17 +40,6 @@ export async function getAllProjects(): Promise<Project[]> {
 
   if (error) throw new Error(error.message);
   return data as Project[];
-}
-
-export async function getProjectById(id: string): Promise<Project | null> {
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (error) throw new Error(error.message);
-  return data as Project;
 }
 
 export async function getProjects(): Promise<Project[]> {
@@ -124,7 +113,23 @@ export async function getActivityImageUrls(
 
   const urls = filenames.map((filename) => {
     const { data } = supabase.storage
-      .from(bucket_name)
+      .from(activities_bucket_name)
+      .getPublicUrl(`${title}/${filename}`);
+    return data.publicUrl;
+  });
+
+  return urls;
+}
+
+export async function getProjectImageUrls(
+  title: string,
+  filenames: string[]
+): Promise<string[]> {
+  if (!filenames || filenames.length === 0) return [];
+
+  const urls = filenames.map((filename) => {
+    const { data } = supabase.storage
+      .from(projects_bucket_name)
       .getPublicUrl(`${title}/${filename}`);
     return data.publicUrl;
   });
