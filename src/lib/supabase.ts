@@ -3,8 +3,8 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabase = createClient(supabaseUrl, supabaseAnonKey);
-const activities_bucket_name = "activities-images";
-const projects_bucket_name = "projects-images";
+const activities_bucket_name = process.env.NEXT_PUBLIC_ACTIVITIES_BUCKET_NAME!;
+const projects_bucket_name = process.env.NEXT_PUBLIC_PROJECTS_BUCKET_NAME!;
 
 export type Activity = {
   id: string;
