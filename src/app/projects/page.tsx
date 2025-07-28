@@ -26,7 +26,11 @@ export default function Projects() {
 
   const project = projects[currentIndex];
 
-  return (
+  return projects.length === 0 ? (
+    <div className="min-h-screen px-4 py-20 flex items-center justify-center text-white text-xl">
+      No projects found.
+    </div>
+  ) : (
     <div className="min-h-screen px-4 py-20 flex flex-col items-center justify-center">
       <div className="w-full max-w-5xl relative overflow-hidden">
         <AnimatePresence mode="wait" initial={false} custom={direction}>

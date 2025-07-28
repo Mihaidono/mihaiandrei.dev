@@ -10,7 +10,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "my-portfolio",
+  title: "Mihai Andrei | Portfolio",
   description: "Portfolio with my projects, education, socials",
 };
 
