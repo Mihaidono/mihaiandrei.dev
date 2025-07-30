@@ -96,7 +96,9 @@ export default function ProjectCard({
   };
 
   const goToModalPrevious = () => {
-    setModalImageIndex((prev) => (prev === 0 ? imageUrls.length - 1 : prev - 1));
+    setModalImageIndex((prev) =>
+      prev === 0 ? imageUrls.length - 1 : prev - 1
+    );
   };
 
   const goToModalNext = () => {
@@ -299,14 +301,14 @@ export default function ProjectCard({
                   <button
                     onClick={goToModalPrevious}
                     aria-label="Previous Image"
-                    className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-300 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-blue-600/90 backdrop-blur-sm border border-blue-500/50 shadow-lg flex items-center justify-center"
+                    className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
                   >
                     &#8592;
                   </button>
                   <button
                     onClick={goToModalNext}
                     aria-label="Next Image"
-                    className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-300 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-blue-600/90 backdrop-blur-sm border border-blue-500/50 shadow-lg flex items-center justify-center"
+                    className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
                   >
                     &#8594;
                   </button>
