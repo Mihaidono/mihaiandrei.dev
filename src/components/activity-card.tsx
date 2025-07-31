@@ -79,10 +79,10 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
       transition={{ duration: 0.2 }}
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
-      className="group bg-gray-800/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105 flex flex-col h-full"
+      className="group bg-gray-800/30 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105 flex flex-col h-full min-h-[420px]"
     >
       {/* Image */}
-      {imageUrls.length > 0 && (
+      {imageUrls.length > 0 ? (
         <div className="relative h-48 w-full overflow-hidden">
           {imageUrls.map((url, idx) => (
             <Image
@@ -96,6 +96,10 @@ export default function ActivityCard({ activity }: ActivityCardProps) {
               }`}
             />
           ))}
+        </div>
+      ) : (
+        <div className="h-48 w-full bg-gradient-to-r from-slate-800 to-slate-700 flex items-center justify-center text-gray-400">
+          No Image
         </div>
       )}
 
