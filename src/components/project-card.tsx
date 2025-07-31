@@ -6,6 +6,7 @@ import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { Project, getProjectImageUrls } from "@/lib/supabase";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 
 interface ProjectCardProps {
   project: Project;
@@ -216,8 +217,9 @@ export default function ProjectCard({
                     aria-label="Previous Image"
                     className="absolute top-1/2 left-2 transform -translate-y-1/2 text-white p-1 rounded-full hover:text-blue-400 transition z-10"
                   >
-                    &#8592;
+                    <ChevronLeftIcon className="w-6 h-6" />
                   </button>
+
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -226,7 +228,7 @@ export default function ProjectCard({
                     aria-label="Next Image"
                     className="absolute top-1/2 right-2 transform -translate-y-1/2 text-white p-1 rounded-full hover:text-blue-400 transition z-10"
                   >
-                    &#8594;
+                    <ChevronRightIcon className="w-6 h-6" />
                   </button>
                 </>
               )}
@@ -303,16 +305,17 @@ export default function ProjectCard({
                   <button
                     onClick={goToModalPrevious}
                     aria-label="Previous Image"
-                    className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
+                    className="absolute left-2 sm:left-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
                   >
-                    &#8592;
+                    <ChevronLeftIcon className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
+
                   <button
                     onClick={goToModalNext}
                     aria-label="Next Image"
-                    className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 text-sm sm:text-lg md:text-xl w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
+                    className="absolute right-2 sm:right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-blue-400 hover:scale-110 transition-all duration-200 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full bg-gray-900/80 backdrop-blur-sm border border-gray-700/50 shadow-lg flex items-center justify-center"
                   >
-                    &#8594;
+                    <ChevronRightIcon className="w-5 h-5 md:w-6 md:h-6" />
                   </button>
                 </>
               )}
