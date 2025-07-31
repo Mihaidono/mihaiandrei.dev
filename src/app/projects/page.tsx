@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { getProjects, Project } from "@/lib/supabase";
 import ProjectCard from "@/components/project-card";
+import { toast } from "sonner";
 
 export default function Projects() {
   const [projects, setProjects] = useState<Project[]>([]);
@@ -12,9 +13,14 @@ export default function Projects() {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const data = await getProjects();
-      setProjects(data);
+      try {
+        const data = await getProjects();
+        setProjects(data);
+      } catch {
+        toast.error("Projects could not be retrieved");
+      }
     };
+
     fetchProjects();
   }, []);
 

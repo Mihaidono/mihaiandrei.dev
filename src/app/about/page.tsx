@@ -18,6 +18,7 @@ import {
 import ActivityCard from "@/components/activity-card";
 import Pagination from "@/components/pagination";
 import { motion } from "framer-motion";
+import { toast } from "sonner";
 
 export default function About() {
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -49,41 +50,40 @@ export default function About() {
   }, []);
 
   useEffect(() => {
+    const fetchActivities = async () => {
+      setLoading(true);
+      try {
+        let activitiesData: Activity[];
+        let totalCount: number;
+
+        if (selectedType === "all") {
+          activitiesData = await getAllActivities(currentPage, maxPerPage);
+          totalCount = await getTotalActivityCount();
+        } else {
+          activitiesData = await getActivitiesByType(
+            selectedType as Activity["type"],
+            currentPage,
+            maxPerPage
+          );
+          totalCount = await getTotalActivityCount(
+            selectedType as Activity["type"]
+          );
+        }
+
+        setActivities(activitiesData);
+        setTotalActivities(totalCount);
+      } catch {
+        toast.error("Activities could not be retrieved");
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchActivities();
   }, [selectedType, currentPage]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedType]);
-
-  const fetchActivities = async () => {
-    setLoading(true);
-    try {
-      let activitiesData: Activity[];
-      let totalCount: number;
-
-      if (selectedType === "all") {
-        activitiesData = await getAllActivities(currentPage, maxPerPage);
-        totalCount = await getTotalActivityCount();
-      } else {
-        activitiesData = await getActivitiesByType(
-          selectedType as Activity["type"],
-          currentPage,
-          maxPerPage
-        );
-        totalCount = await getTotalActivityCount(
-          selectedType as Activity["type"]
-        );
-      }
-
-      setActivities(activitiesData);
-      setTotalActivities(totalCount);
-    } catch (error) {
-      console.error("Error fetching activities:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const visibleActivities = activities.slice(0, visibleCount);
 
@@ -119,7 +119,7 @@ export default function About() {
             About Me
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            Whether it's developing full-stack applications, scripting
+            Whether it&apos;s developing full-stack applications, scripting
             automation tools, or building smart systems, I enjoy turning
             complexity into functional solutions.
           </p>
@@ -157,14 +157,14 @@ export default function About() {
             </h2>
             <div className="space-y-4 text-gray-300 leading-relaxed">
               <p>
-                I completed my <b>Bachelor's degree</b> in{" "}
+                I completed my <b>Bachelor&apos;s degree</b> in{" "}
                 <b>Computer Science</b> at the{" "}
                 <b>University of Transylvania in Brașov</b>, where I gained a
                 deep understanding of software development, systems
                 architecture, and algorithmic thinking.
               </p>
               <p>
-                Currently, I'm pursuing a <b>Master's degree</b> in{" "}
+                Currently, I&apos;m pursuing a <b>Master&apos;s degree</b> in{" "}
                 <b>Cyber Security</b> at the same university. My academic
                 background is complemented by hands-on experience in
                 internships, research projects, and competitions, where I apply
@@ -180,7 +180,7 @@ export default function About() {
             Skills & Expertise
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {skills.map((skill, index) => (
+            {skills.map((skill) => (
               <div
                 key={skill.name}
                 className="group bg-gray-800/30 backdrop-blur-sm rounded-xl p-6 border border-gray-700 hover:border-gray-600 transition-all duration-300 hover:scale-105"

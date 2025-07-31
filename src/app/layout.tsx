@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 import Navbar from "@/components/navbar";
 import AnimatedBackground from "@/components/animated-background";
+import { Toaster } from "@/components/ui/sonner";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
         <AnimatedBackground />
         <Navbar />
         <main className="relative z-10">{children}</main>
+        <Toaster position="top-center" />
       </body>
     </html>
   );

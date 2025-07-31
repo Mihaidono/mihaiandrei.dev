@@ -37,9 +37,10 @@ export default function Home() {
         {/* Introduction */}
         <div className="max-w-lg mx-auto">
           <p className="text-gray-300 text-base sm:text-lg leading-relaxed">
-            I'm passionate about programming and thrive on solving real-world
-            problems through it. I'm driven by challenges and always eager to
-            exceed expectations by creating efficient, impactful solutions.
+            &quot;I&apos;m passionate about programming and thrive on solving
+            real-world problems through it. I&apos;m driven by challenges and
+            always eager to exceed expectations by creating efficient, impactful
+            solutions.&quot;
           </p>
         </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { Github, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 import Image from "next/image";
 import ReactMarkdown from "react-markdown";
 import { Project, getProjectImageUrls } from "@/lib/supabase";
@@ -10,7 +10,10 @@ import { Project, getProjectImageUrls } from "@/lib/supabase";
 interface ProjectCardProps {
   project: Project;
   direction: number;
-  onDragEnd: (event: MouseEvent | TouchEvent | PointerEvent, info: any) => void;
+  onDragEnd: (
+    event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo
+  ) => void;
 }
 
 export default function ProjectCard({
@@ -36,12 +39,12 @@ export default function ProjectCard({
     fetchImageUrls();
   }, [project]);
 
-  const startAutoPlay = () => {
+  const startAutoPlay = useCallback(() => {
     if (slideIntervalRef.current) clearInterval(slideIntervalRef.current);
     slideIntervalRef.current = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % imageUrls.length);
     }, 5000);
-  };
+  }, [imageUrls.length]);
 
   useEffect(() => {
     if (imageUrls.length > 1 && !isModalOpen) {
@@ -51,7 +54,7 @@ export default function ProjectCard({
       if (slideIntervalRef.current) clearInterval(slideIntervalRef.current);
       if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current);
     };
-  }, [imageUrls, isModalOpen]);
+  }, [imageUrls, isModalOpen, startAutoPlay]);
 
   const resetAutoPlayWithDelay = () => {
     if (slideIntervalRef.current) {
@@ -88,12 +91,12 @@ export default function ProjectCard({
     setIsModalOpen(true);
   };
 
-  const closeModal = () => {
+  const closeModal = useCallback(() => {
     setIsModalOpen(false);
     if (imageUrls.length > 1) {
       startAutoPlay();
     }
-  };
+  }, [imageUrls.length, startAutoPlay]);
 
   const goToModalPrevious = () => {
     setModalImageIndex((prev) =>
@@ -105,7 +108,6 @@ export default function ProjectCard({
     setModalImageIndex((prev) => (prev + 1) % imageUrls.length);
   };
 
-  // Handle ESC key to close modal
   useEffect(() => {
     const handleEscKey = (event: KeyboardEvent) => {
       if (event.key === "Escape" && isModalOpen) {
@@ -124,7 +126,7 @@ export default function ProjectCard({
       document.removeEventListener("keydown", handleEscKey);
       document.body.style.overflow = "auto";
     };
-  }, [isModalOpen]);
+  }, [isModalOpen, closeModal]);
 
   return (
     <>
