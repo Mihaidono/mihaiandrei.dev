@@ -6,7 +6,7 @@ import SocialButton from "@/components/social-button";
 
 export default function Home() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
+    <div className="min-h-screen flex items-center justify-center pt-16 px-4">
       <div className="max-w-2xl w-full text-center space-y-8">
         {/* Profile Picture */}
         <div className="relative mx-auto w-32 h-32 sm:w-40 sm:h-40 lg:w-48 lg:h-48">
