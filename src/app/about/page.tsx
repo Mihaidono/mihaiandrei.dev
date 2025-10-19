@@ -73,7 +73,7 @@ export default function About() {
         setActivities(activitiesData);
         setTotalActivities(totalCount);
       } catch {
-        toast.error("Activities could not be retrieved");
+        toast.error("Activities won't appear because I didn't pay :X");
       } finally {
         setLoading(false);
       }

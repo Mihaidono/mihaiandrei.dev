@@ -17,7 +17,7 @@ export default function Projects() {
         const data = await getProjects();
         setProjects(data);
       } catch {
-        toast.error("Projects could not be retrieved");
+        toast.error("Projects won't appear because I didn't pay :X");
       }
     };
 
